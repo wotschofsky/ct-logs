@@ -3,7 +3,10 @@ import { CertStreamClient } from './cert-stream';
 import { addDomain } from './redis';
 
 let client = new CertStreamClient(meta => {
-  meta.data.leaf_cert.all_domains?.forEach(addDomain)
+  const { all_domains } = meta.data.leaf_cert
+  if (!all_domains) return
+  console.log('Logging domains', all_domains)
+  all_domains?.forEach(addDomain)
 });
 
 const logEvent = (event: string) => (...args: unknown[]) => logger.info(event, {
