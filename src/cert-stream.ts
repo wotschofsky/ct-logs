@@ -1,5 +1,4 @@
 import WebSocket from 'ws';
-import ReconnectingWebSocket from 'reconnecting-websocket';
 
 const url = 'wss://certstream.calidog.io/';
 
@@ -93,16 +92,14 @@ type Source = {
 type MessageCallback = (message: Message) => void;
 
 export class CertStreamClient {
-    public ws?: ReconnectingWebSocket;
+    public ws?: WebSocket;
 
     constructor(private callback: MessageCallback, private logger: Logger = console) { }
 
     async connect() {
         return new Promise<void>((resolve, reject) => {
             this.logger.debug(`Connecting to ${url}...`);
-            this.ws = new ReconnectingWebSocket(url, undefined, {
-                WebSocket,
-            });
+            this.ws = new WebSocket(url);
 
             const timeout = setTimeout(() => {
                 // Remove current socket
@@ -120,6 +117,15 @@ export class CertStreamClient {
                 let parsedMessage = JSON.parse(message.data) as Message;
                 if (parsedMessage.message_type === 'heartbeat') return;
                 this.callback(parsedMessage);
+            };
+
+            this.ws.onclose = () => {
+              process.exit(0);
+            }
+
+            this.ws.onerror = (error) => {
+                console.debug('Error:', error);
+                process.exit(0);
             };
         });
     }
