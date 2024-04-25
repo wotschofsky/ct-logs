@@ -9,12 +9,6 @@ let client = new CertStreamClient(meta => {
   all_domains?.forEach(addDomain)
 });
 
-const logEvent = (event: string) => (...args: unknown[]) => logger.info(event, {
-  meta: {
-    ...args
-  },
-});
-
 console.info('> started');
 
 // Connect to the websocket server
@@ -23,6 +17,3 @@ console.info('> connected to stream');
 
 // Failed to connect
 if (!client.ws) process.exit(0);
-
-client.ws.onclose = logEvent('close');
-client.ws.onerror = logEvent('error');
