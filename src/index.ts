@@ -1,15 +1,15 @@
 import 'dotenv/config';
-import { logger } from '@app/logger';
 import { CertStreamClient } from './cert-stream';
+import { addDomain } from './redis';
 
 let client = new CertStreamClient(meta => {
-    logger.info('new-cert', meta);
+  meta.data.leaf_cert.all_domains?.forEach(addDomain)
 });
 
 const logEvent = (event: string) => (...args: unknown[]) => logger.info(event, {
-    meta: {
-        ...args
-    },
+  meta: {
+    ...args
+  },
 });
 
 console.info('> started');
