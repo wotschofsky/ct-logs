@@ -1,6 +1,7 @@
 import 'dotenv/config';
+
 import { CertStreamClient } from './cert-stream';
-import { addDomain } from './redis';
+import { addDomain } from './mongo';
 
 let client = new CertStreamClient(meta => {
   const { all_domains } = meta.data.leaf_cert
