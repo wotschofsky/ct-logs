@@ -11,12 +11,25 @@ const baseDomains = db.collection('baseDomains');
 
 const addUniqueValue = async (collection: Collection<Document>, value: string) => {
   const entry = await collection.find({ value }).next();
-  if (entry) return;
-  await collection.insertOne({ value });
+
+  if (entry) {
+    await collection.updateOne({ _id: entry._id }, {
+      $set: { lastSeen: new Date() }
+    });
+    return;
+  };
+
+  await collection.insertOne({
+    value,
+    firstSeen: new Date(),
+    lastSeen: new Date()
+  });
 }
 
 export const addDomain = async (domain: string) => {
   const baseDomain = getBaseDomain(domain);
-  await addUniqueValue(domains, domain)
-  await addUniqueValue(baseDomains, baseDomain)
+  await Promise.all([
+    addUniqueValue(domains, domain),
+    addUniqueValue(baseDomains, baseDomain)
+  ])
 };
