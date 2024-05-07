@@ -9,6 +9,9 @@ const db = client.db('certstream');
 const domains = db.collection('domains');
 const baseDomains = db.collection('baseDomains');
 
+domains.createIndex({ value: 1 }, { unique: true });
+baseDomains.createIndex({ value: 1 }, { unique: true });
+
 const addUniqueValue = async (collection: Collection<Document>, value: string) => {
   const entry = await collection.find({ value }).next();
 
