@@ -1,4 +1,10 @@
-import { type Collection, type Document, MongoClient } from 'mongodb';
+import {
+  type Collection,
+  type Document,
+  MongoClient,
+  type MongoError,
+} from 'mongodb';
+
 import { getBaseDomain } from './utils';
 
 const client = new MongoClient(process.env.MONGO_URL!);
@@ -22,11 +28,17 @@ const addUniqueValue = async (collection: Collection<Document>, value: string) =
     return;
   };
 
-  await collection.insertOne({
-    value,
-    firstSeen: new Date(),
-    lastSeen: new Date()
-  });
+  try {
+    await collection.insertOne({
+      value,
+      firstSeen: new Date(),
+      lastSeen: new Date()
+    });
+  } catch (error) {
+    if ((error as MongoError).code !== 11000) {
+      throw error;
+    }
+  }
 }
 
 export const addDomain = async (domain: string) => {
