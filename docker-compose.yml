@@ -1,0 +1,16 @@
+services:
+  app:
+    build: .
+    depends_on:
+      - db
+    restart: always
+    environment:
+      - MONGO_URL=mongodb://root:secret@db:27017
+  db:
+    image: mongo
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    volumes:
+      - ./data/db:/data/db
